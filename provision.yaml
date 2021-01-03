@@ -3,9 +3,20 @@
   gather_facts: false
   vars:
     project_dir: "terraform/"
+    cloud_image: "/var/lib/libvirt/images/rhel-8.3-x86_64-kvm.qcow2"
   vars_files:
     - rhn_vars.yaml
   tasks:
+    - name: Check if cloud image is available
+      stat:
+        path: "{{ cloud_image }}"
+      register: image_check
+
+    - name: Fail if image is absent
+      fail:
+        msg: "RHEL cloud image is not installed in the proper path"
+      when: image_check.stat.exists == false
+
     - name: Apply Terraform configuration
       terraform:
         force_init: true
