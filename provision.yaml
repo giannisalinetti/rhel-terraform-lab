@@ -3,6 +3,8 @@
   gather_facts: false
   vars:
     project_dir: "terraform/"
+  vars_files:
+    - rhn_vars.yaml
   tasks:
     - name: Apply Terraform configuration
       terraform:
@@ -33,8 +35,6 @@
         auto_attach: true
       delegate_to: "{{ tf_host }}"
       become: true
-      vars_files:
-        - rhn_vars.yaml
       vars:
         ansible_ssh_user: "core"
 

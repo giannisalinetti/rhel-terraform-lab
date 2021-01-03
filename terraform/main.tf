@@ -22,6 +22,11 @@ variable "os_image" {
     default = "/var/lib/libvirt/images/rhel-8.3-x86_64-kvm.qcow2"
 }
 
+variable "public_key" {
+    type = string
+    default = "~/.ssh/id_rsa.pub"
+}
+
 variable "libvirt_pool" {
     type = string
     default = "default"
@@ -69,6 +74,7 @@ data "template_file" "user_data" {
     template = file("${path.module}/cloud_init.cfg")
     vars = {
       hostname = var.hostname
+      public_key = var.public_key
       fqdn = "${var.hostname}.${var.domain}"
       iface = var.iface
     }
