@@ -1,0 +1,11 @@
+---
+- hosts: localhost
+  gather_facts: false
+  vars:
+    project_dir: "terraform/"
+  tasks:
+    - name: Destroy Terraform infrastructure configuration
+      terraform:
+        project_path: "{{ project_dir }}"
+        state: absent
+

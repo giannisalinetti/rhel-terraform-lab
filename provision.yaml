@@ -1,0 +1,58 @@
+---
+- hosts: localhost
+  gather_facts: false
+  vars:
+    project_dir: "terraform/"
+  tasks:
+    - name: Apply Terraform configuration
+      terraform:
+        force_init: true
+        project_path: "{{ project_dir }}"
+        state: present
+      register: tf_out
+
+    - set_fact:
+        tf_host: "{{ tf_out.outputs.host_address.value }}"
+
+    - name: Add provisioned host
+      add_host:
+        hostname: "{{ tf_host }}"
+
+    - name: Wait for bootstrap completion
+      wait_for:
+        port: 22
+        host: "{{ tf_host }}"
+        delay: 25
+        timeout: 200
+
+    - name: Register as user {{ rhn_id }} and auto-subscribe to available content.
+      redhat_subscription:
+        state: present
+        username: "{{ rhn_id }}"
+        password: "!Fga_0902#"
+        auto_attach: true
+      delegate_to: "{{ tf_host }}"
+      become: true
+      vars_files:
+        - rhn_vars.yaml
+      vars:
+        ansible_ssh_user: "core"
+
+    - name: Install basic packages
+      dnf:
+        name: "{{ pkg_list }}"
+        state: latest
+      delegate_to: "{{ tf_host }}"
+      become: true
+      vars:
+        ansible_ssh_user: "core"
+        pkg_list:
+          - vim
+          - git
+          - wget
+          - bash-completion
+          - podman
+          - tmux
+
+      
+
