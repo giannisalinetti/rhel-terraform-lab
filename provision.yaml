@@ -29,7 +29,7 @@
       redhat_subscription:
         state: present
         username: "{{ rhn_id }}"
-        password: "!Fga_0902#"
+        password: "{{ rhn_password }}"
         auto_attach: true
       delegate_to: "{{ tf_host }}"
       become: true
